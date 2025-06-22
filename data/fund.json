@@ -1,0 +1,14 @@
+{
+  "accounts": ["2016", "8888", "Cash", "7779"],
+  "members": ["Tuấn", "Thịnh", "Sang"],
+  "transactions": [
+    {"type":"Thu","account":"2016","amount":50000,"member":"Tuấn","time":"19-06 09:38"},
+    {"type":"Thu","account":"2016","amount":100000,"member":"Thịnh","time":"19-06 09:38"},
+    {"type":"Thu","account":"2016","amount":50000,"member":"Sang","time":"19-06 09:39"},
+    {"type":"Chi","account":"7779","amount":0,"member":"Sang","time":"19-06 10:49"},
+    {"type":"Chi","account":"8888","amount":0,"member":"Sang","time":"19-06 11:11"},
+    {"type":"Thu","account":"2016","amount":40000,"member":"Tuấn","time":"19-06 11:15"},
+    {"type":"Thu","account":"Cash","amount":30000,"member":"Sang","time":"19-06 11:20"},
+    {"type":"Thu","account":"Cash","amount":90909090,"member":"Sang","time":"19-06 17:41"}
+  ]
+}
