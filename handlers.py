@@ -9,7 +9,6 @@ async def start_handler(message: types.Message):
     keyboard.add(
         types.InlineKeyboardButton("💰 Quản Lý Quỹ", callback_data="fund_menu"),
         types.InlineKeyboardButton("📊 Báo Cáo Tuần", callback_data="weekly_menu"),
-        types.InlineKeyboardButton("📊 Tổng hợp", callback_data="weekly_all_history")
     )
     await message.answer("📋 Chọn chức năng:", reply_markup=keyboard)
 

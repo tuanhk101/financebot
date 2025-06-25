@@ -72,12 +72,20 @@ async def handle_account_callback(query: CallbackQuery, state: FSMContext):
     await FundState.choosing_member.set()
 
 async def handle_member_callback(query: CallbackQuery, state: FSMContext):
+    await query.answer()
+
+    if query.data == "add_member":
+        await query.message.answer("Gõ tên người mới:")
+        await FundState.adding_member.set()
+        return
+
     if query.data.startswith("mem_"):
         member = query.data.replace("mem_", "")
         await state.update_data(member=member)
-        await query.message.delete()  # 🧹 Xoá menu chọn người sau khi chọn
+        await query.message.delete()
         await query.message.answer("Nhập số tiền:")
         await FundState.entering_amount.set()
+
 
 async def save_transaction(message: types.Message, state: FSMContext):
     try:

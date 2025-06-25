@@ -1,9 +1,26 @@
 {
   "2025-06-16": {
-    "TH a6.3": {
-      "amount": -100000,
-      "rate": 15.0,
-      "tientuan": -85000
+    "TH 004": {
+      "amount": 40000,
+      "rate": 50.0,
+      "tientuan": 20000
+    },
+    "Khang ut2": {
+      "amount": -30000,
+      "rate": 10.0,
+      "tientuan": -27000
+    }
+  },
+  "2025-06-23": {
+    "A6.2": {
+      "amount": 600000,
+      "rate": 40,
+      "tientuan": 360000
+    },
+    "Phung D": {
+      "amount": 30000,
+      "rate": 40,
+      "tientuan": 18000
     }
   }
 }

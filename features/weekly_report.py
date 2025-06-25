@@ -8,11 +8,17 @@ from datetime import datetime, timedelta
 from utils import current_time
 
 REPORT_FILE = "data/reports.json"
+INFO_FILE = "data/baocaotuan.json"
 
+# members = [
+#     "Co Hương", "Goem", "Huyen", "Hieu", "Vũ", "Lâm Bình", "Tú", "Vk Gấu", "Thuy", "Bi", "aTha",
+#     "Family", "Vinh(PH)", "A6 ATuan", "Aliem", "cHang", "aSang", "a6.4", "Diaky Tuana6", "a6 usa", "a6.2", "a6.3", "atuan.2 a6", "phungD", "Tuan(vani)",
+#     "Khang", "Trung", "TH 001", "TH 002", "TH 003", "TH 004", "TH 005", "aha Khang", "Dieu(khangtc) 35%", "Khang ut2", "ut khang"
+# ]
 members = [
-    "TH13 Co Hương", "TH14 gom", "TH2 Huyen", "TH3 Hieu", "TH4 Vũ", "TH5 Lâm Bình", "TH6 Tú", "TH7 vk gấu", "TH8 thuy", "TH9 Bi", "THatha",
-    "TH Family", "TH Vinh(PH)", "TH a6 aTuan", "TH Aliem PH", "TH cHang PH", "TH10 aSang", "TH a6.4", "TH Diaky tuana6", "TH a6 usa", "TH a6.2", "TH a6.3", "TH atuan.2 a6", "TH phungD", "TH tuan(vani)",
-    "TH12 Khang", "TH Trung", "TH 001", "TH 002", "TH 003", "TH 004", "TH 005", "TH aha Khang", "TH dieu(khangtc) 35%", "TH khang ut2", "TH ut khang"
+    "Co Huong", "Goem", "Huyền", "Hieu", "Vũ", "Lâm Bình", "Tu", "Vk Gau", "Thuy", "Bi", "Atha",
+    "Family", "Vinh", "A6. A Tuan", "ALiem", "CHang", "ASang", "A6.4", "A6.usa", "A6.2", "A6.3", "Phung D", "Tuan(Vani)",
+    "Khang", "Trung", "TH 001", "TH 002", "TH 003", "TH 004", "TH 005", "Aha Khang", "Dieu(Khang)", "Khang Ut 2", "Duy Khang", "Ut Khang"
 ]
 
 class WeeklyReportState(StatesGroup):
@@ -22,9 +28,7 @@ class WeeklyReportState(StatesGroup):
     adding_member = State()
     custom_rate = State()
 
-
 rate_overrides = {}
-available_rates = [10, 15, 20, 25, 30, 35, 40, 45, 50]
 
 def load_reports():
     if not os.path.exists(REPORT_FILE):
@@ -34,6 +38,20 @@ def load_reports():
             return json.load(f)
     except json.JSONDecodeError:
         return {}
+
+def load_info():
+    if not os.path.exists(INFO_FILE):
+        return {}
+    try:
+        with open(INFO_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {}
+
+def save_info(info):
+    os.makedirs(os.path.dirname(INFO_FILE), exist_ok=True)
+    with open(INFO_FILE, "w", encoding="utf-8") as f:
+        json.dump(info, f, indent=2, ensure_ascii=False)
 
 def save_report(week_key: str, week_data: dict):
     print(f"[CALL] save_report: week={week_key}, entries={len(week_data)}")
@@ -53,8 +71,6 @@ def save_report(week_key: str, week_data: dict):
 
     print(f"[DONE] reports.json saved with {len(reports)} tuần")
 
-
-
 def get_week_range(date=None):
     if date is None:
         date = datetime.today()
@@ -67,19 +83,9 @@ def get_week_key(date=None):
         date = datetime.today()
     monday = date - timedelta(days=date.weekday())
     return monday.strftime("%Y-%m-%d")
-async def show_all_weeks_report(query: CallbackQuery):
-    await query.answer()
-    reports = load_reports()
-    if not reports:
-        await query.message.answer("⚠️ Không có dữ liệu báo cáo nào.")
-        return
 
-    lines = ["<b>Tổng hợp các tuần:</b>"]
-    for week, entries in sorted(reports.items()):
-        total = sum(x["tientuan"] for x in entries.values())
-        lines.append(f"🗓️ {week} | {'+' if total > 0 else ''}{total:,} VNĐ")
+# các đoạn xử lý còn lại không thay đổi và sử dụng load_info() để lấy rate/group_master từ file data/baocaotuan.json
 
-    await query.message.answer("\n".join(lines), parse_mode="HTML")
 
 async def weekly_menu(query: CallbackQuery):
     await query.answer()
@@ -131,15 +137,31 @@ async def handle_choose_person(query: CallbackQuery, state: FSMContext):
         except:
             pass
 
-    await show_rate_options(query.message)
-    await WeeklyReportState.entering_rate.set()
+    # ⛳️ Gán rate cố định từ baocaotuan.json
+    info = load_info()
+    default_rate = info.get(name, {}).get("rate", 0)
+    rate_overrides[name] = default_rate
+    await state.update_data(current_rate=default_rate)
+
+    await query.message.answer(
+        f"👤 {name} (tỷ lệ: {default_rate}%)\n💵 Nhập số tiền (có thể âm hoặc dương):",
+        reply_markup=types.ForceReply(selective=True)
+    )
+    await WeeklyReportState.entering_amount.set()
+
 
 async def show_rate_options(message):
-    keyboard = InlineKeyboardMarkup(row_width=5)
-    for rate in available_rates:
+    info = load_info()
+    keyboard = InlineKeyboardMarkup(row_width=2)
+
+    # Lấy danh sách rate từ baocaotuan.json nếu có
+    unique_rates = sorted(set(entry.get("rate", 0) for entry in info.values()))
+    for rate in unique_rates:
         keyboard.insert(InlineKeyboardButton(f"{rate}%", callback_data=f"rate_{rate}"))
+
     keyboard.add(InlineKeyboardButton("➕ Tự nhập", callback_data="custom_rate"))
     await message.answer("Chọn tỷ lệ (%):", reply_markup=keyboard)
+
     
 async def enter_rate_callback(query: CallbackQuery, state: FSMContext):
     await query.answer()
@@ -149,7 +171,11 @@ async def enter_rate_callback(query: CallbackQuery, state: FSMContext):
     current_person = session.get("current_person")
     rate_overrides[current_person] = rate_val
     await state.update_data(current_rate=rate_val)
-    await query.message.answer("💵 Nhập số tiền (có thể âm hoặc dương):\n👉 Gõ /rate nếu muốn thay đổi lại tỷ lệ.")
+    await query.message.answer(
+    "💵 Nhập số tiền (có thể âm hoặc dương):",
+    reply_markup=types.ForceReply(selective=True)
+    )
+
     await WeeklyReportState.entering_amount.set()
 
 async def handle_custom_rate(query: CallbackQuery):
@@ -158,20 +184,7 @@ async def handle_custom_rate(query: CallbackQuery):
     await WeeklyReportState.custom_rate.set()
     await query.message.delete() 
 
-async def enter_custom_rate(message: types.Message, state: FSMContext):
-    try:
-        rate_val = float(message.text.strip().replace("%", ""))
-    except:
-        return await message.answer("⚠️ Nhập tỷ lệ không hợp lệ. Vui lòng nhập lại.")
 
-    data = await state.get_data()
-    current_person = data.get("current_person")
-    rate_overrides[current_person] = rate_val
-    await state.update_data(current_rate=rate_val)
-    if rate_val not in available_rates:
-        available_rates.append(int(rate_val))
-    await message.answer("💵 Nhập số tiền (có thể âm hoặc dương):\n👉 Gõ /rate nếu muốn thay đổi lại tỷ lệ.")
-    await WeeklyReportState.entering_amount.set()
 
 async def add_member(message: types.Message, state: FSMContext):
     new_name = message.text.strip()
@@ -224,9 +237,15 @@ async def enter_amount(message: types.Message, state: FSMContext):
 
 async def finish_report_callback(query: CallbackQuery, state: FSMContext):
     await query.answer()
+    data = await state.get_data()
+    report_data = data.get("report_data", {})
+
+    if not report_data:
+        await query.message.answer("⚠️ Bạn chưa nhập liệu cho ai cả.\nVui lòng nhập thông tin ít nhất 1 người trước khi hoàn thành.")
+        return
+
     await query.message.delete()
     await finish_weekly_report(query.message, state)
-    print(f"[✅ SAVED] Tuần: {week_key}, Tổng: {len(report_data)} mục")
 
 
 async def finish_weekly_report(message: types.Message, state: FSMContext):
@@ -239,7 +258,7 @@ async def finish_weekly_report(message: types.Message, state: FSMContext):
     week_key = get_week_key()
     save_report(week_key, report_data)
 
-    
+    # Gửi danh sách tổng hợp trước
     week_title = f"🗓️ Lịch Sử Tuần {get_week_range()}"
     header = "ID | Name       | Type | Amount"
     lines = []
@@ -251,7 +270,19 @@ async def finish_weekly_report(message: types.Message, state: FSMContext):
 
     msg = f"<pre>{week_title}\n{header}\n" + "\n".join(lines) + "</pre>"
     await message.answer(msg, parse_mode="HTML")
+
+    # Sau đó gửi từng người bản tóm tắt riêng
+    for person, entry in report_data.items():
+        amount = entry["amount"]
+        rate = entry["rate"]
+        tientuan = entry["tientuan"]
+        label = "Bù" if tientuan > 0 else "Thu"
+
+        await message.answer(f"👤 {person}")
+        await message.answer(f"{amount:,.0f} - {rate:.0f}%\n{label} {tientuan:,}")
+
     await state.finish()
+
 
 async def show_history_menu(callback: CallbackQuery):
     await callback.answer()
@@ -289,17 +320,34 @@ async def show_history_detail(query: CallbackQuery):
 
     msg = f"<pre>{week_title}\n{header}\n" + "\n".join(lines) + "</pre>"
     await query.message.edit_text(msg, parse_mode="HTML")
+async def show_all_weeks_report(query: CallbackQuery):
+    await query.answer()
+    reports = load_reports()
+    if not reports:
+        await query.message.answer("⚠️ Không có dữ liệu báo cáo nào.")
+        return
+
+    lines = ["<b>Tổng hợp các tuần:</b>"]
+    for week, entries in sorted(reports.items()):
+        total = sum(x["tientuan"] for x in entries.values())
+        lines.append(f"🗓️ {week} | {'+' if total > 0 else ''}{total:,} VNĐ")
+
+    await query.message.answer("\n".join(lines), parse_mode="HTML")
 
 def register(dp):
     dp.register_callback_query_handler(weekly_menu, lambda c: c.data == "weekly_menu")
     dp.register_callback_query_handler(start_weekly_report, lambda c: c.data == "weekly_start")
     dp.register_callback_query_handler(show_history_menu, lambda c: c.data == "weekly_history")
     dp.register_callback_query_handler(handle_choose_person, lambda c: c.data.startswith("choose_"), state=WeeklyReportState.choosing_person)
-    dp.register_callback_query_handler(enter_rate_callback, lambda c: c.data.startswith("rate_"), state=WeeklyReportState.entering_rate)
-    dp.register_callback_query_handler(handle_custom_rate, lambda c: c.data == "custom_rate", state=WeeklyReportState.entering_rate)
+    #dp.register_callback_query_handler(enter_rate_callback, lambda c: c.data.startswith("rate_"), state=WeeklyReportState.entering_rate)
+    #dp.register_callback_query_handler(handle_custom_rate, lambda c: c.data == "custom_rate", state=WeeklyReportState.entering_rate)
     dp.register_callback_query_handler(finish_report_callback, lambda c: c.data == "finish_report", state=WeeklyReportState.choosing_person)
-    dp.register_message_handler(enter_custom_rate, state=WeeklyReportState.custom_rate)
+    #dp.register_message_handler(enter_custom_rate, state=WeeklyReportState.custom_rate)
     dp.register_message_handler(add_member, state=WeeklyReportState.adding_member)
     dp.register_message_handler(enter_amount, state=WeeklyReportState.entering_amount)
     dp.register_callback_query_handler(show_history_detail, lambda c: c.data in ["history_this_week", "history_last_week"])
     dp.register_callback_query_handler(show_all_weeks_report, lambda c: c.data == "weekly_all_history")
+    dp.register_callback_query_handler(
+    handle_choose_person, lambda c: c.data.startswith("choose_"), state=WeeklyReportState.choosing_person
+)
+

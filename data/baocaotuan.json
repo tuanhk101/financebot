@@ -1,0 +1,142 @@
+{
+  "Co Hương": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Goem": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Huyền": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Hieu": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Vũ": {
+    "group_master": "TH01",
+    "rate": 25
+  },
+  "Lâm Bình": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Tu": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Vk Gau": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Thuy": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Bi": {
+    "group_master": "TH01",
+    "rate": 0
+  },
+  "Atha": {
+    "group_master": "TH01",
+    "rate": 10
+  },
+  "Family": {
+    "group_master": "TH02",
+    "rate": 35
+  },
+  "Vinh": {
+    "group_master": "TH02",
+    "rate": 50
+  },
+  "A6. A Tuan": {
+    "group_master": "TH02",
+    "rate": 30
+  },
+  "ALiem": {
+    "group_master": "TH02",
+    "rate": 35
+  },
+  "CHang": {
+    "group_master": "TH02",
+    "rate": 35
+  },
+  "ASang": {
+    "group_master": "TH02",
+    "rate": 20
+  },
+  "A6.4": {
+    "group_master": "TH02",
+    "rate": 20
+  },
+  "A6.usa": {
+    "group_master": "TH02",
+    "rate": 40
+  },
+  "A6.2": {
+    "group_master": "TH02",
+    "rate": 40
+  },
+  "A6.3": {
+    "group_master": "TH02",
+    "rate": 40
+  },
+  "Phung D": {
+    "group_master": "TH02",
+    "rate": 40
+  },
+  "Tuan(Vani)": {
+    "group_master": "TH02",
+    "rate": 30
+  },
+  "Khang": {
+    "group_master": "TH04",
+    "rate": 40
+  },
+  "Trung": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "TH 001": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "TH 002": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "TH 003": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "TH 004": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "TH 005": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "Aha Khang": {
+    "group_master": "TH04",
+    "rate": 55
+  },
+  "Dieu(Khang)": {
+    "group_master": "TH04",
+    "rate": 55
+  },
+  "Khang Ut 2": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "Duy Khang": {
+    "group_master": "TH04",
+    "rate": 50
+  },
+  "Ut Khang": {
+    "group_master": "TH04",
+    "rate": 60
+  }
+}
