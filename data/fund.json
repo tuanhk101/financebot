@@ -4,6 +4,7 @@
   "transactions": [
     {"type":"Thu","account":"7779","amount":120890,"member":"Tuấn","time":"19-06 09:38"},
     {"type":"Thu","account":"VCB Bin","amount":79110,"member":"Thịnh","time":"19-06 09:38"},
-    {"type":"Chi","account":"VCB Bin","amount":50000,"member":"Tú","time":"25-06 14:56"}
+    {"type":"Chi","account":"VCB Bin","amount":50000,"member":"Tú","time":"25-06 14:56"},
+    {"type":"Thu","account":"VCB Bin","amount":50000,"member":"Tú","time":"25-06 18:51"}
   ]
 }

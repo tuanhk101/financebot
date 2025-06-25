@@ -12,15 +12,10 @@
     }
   },
   "2025-06-23": {
-    "A6.2": {
-      "amount": 600000,
-      "rate": 40,
-      "tientuan": 360000
-    },
-    "Phung D": {
-      "amount": 30000,
-      "rate": 40,
-      "tientuan": 18000
+    "Co Huong": {
+      "amount": -100000,
+      "rate": 0,
+      "tientuan": -100000
     }
   }
 }
